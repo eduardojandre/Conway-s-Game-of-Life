@@ -8,7 +8,7 @@ using BoardManager.Exceptions;
 namespace Conway_s_Game_of_Life.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("boards")]
     [Authorize]
     [Produces("application/json")]
     [Consumes("application/json")]
@@ -26,6 +26,34 @@ namespace Conway_s_Game_of_Life.Controllers
             _logger = logger;
         }
 
+        [RequiredScope(JwtConfiguration.ReadScope)]
+        [ProducesResponseType(typeof(IEnumerable<BoardManager.DTOs.Board>), 200)]
+        [ProducesResponseType(204)]
+        [HttpGet()]
+        public async Task<IActionResult> GetAll([FromQuery] int pageSize = 100, int pageNumber = 1)
+        {
+            var boardsCount = await _boardManager.GetBoardsCountAsync();
+            var boards = await _boardManager.GetAllBoardsAsync(pageSize, pageNumber);
+            if (boards == null)
+                return NoContent();
+            var result = Ok(boards);
+
+            Response.Headers.Add("X-Total-Count", boardsCount.ToString());
+            return Ok(boards);
+        }
+
+        [RequiredScope(JwtConfiguration.ReadScope)]
+        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
+        [ProducesResponseType(204)]
+        [HttpGet($"{{id}}")]
+        public async Task<IActionResult> GetById([FromRoute] string id)
+        {
+            var board = await _boardManager.GetBoardAsync(id);
+            if (board == null)
+                return NotFound();
+            return Ok(board);
+        }
+
         [HttpPost]
         [RequiredScope(JwtConfiguration.WriteScope)]
         [ProducesResponseType(typeof(BoardManager.DTOs.Board), 201)]
@@ -37,45 +65,6 @@ namespace Conway_s_Game_of_Life.Controllers
             }
             var result = await _boardManager.InsertBoardAsync(request);
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
-        }
-
-        [RequiredScope(JwtConfiguration.ReadScope)]
-        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
-        [HttpGet($"{{id}}")]
-        public async Task<IActionResult> GetById([FromRoute] string id)
-        {
-            var board = await _boardManager.GetBoardAsync(id);
-            if (board == null)
-                return NoContent();
-            return Ok(board);
-        }
-
-        [RequiredScope(JwtConfiguration.ReadScope)]
-        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
-        [HttpPost($"{{boardId}}/generations")]
-        public async Task<IActionResult> CreateGeneration([FromRoute] string boardId)
-        {
-            try
-            {
-                var result = await _boardManager.AddGeneration(boardId);
-                return CreatedAtAction(nameof(GetGenerationByNumber), new { boardId = result.Board.Id, generationNumber = result.Number }, result);
-            }
-            catch (BusineesException ex) { 
-                return BadRequest(ex.Message);
-            }            
-        }
-        [RequiredScope(JwtConfiguration.ReadScope)]
-        [ProducesResponseType(typeof(BoardManager.DTOs.Generation), 200)]
-        [ProducesResponseType(204)]
-        [HttpGet($"{{boardId}}/generations/{{generationNumber}}")]
-        public async Task<IActionResult> GetGenerationByNumber([FromRoute] string boardId, int generationNumber)
-        {
-            var generation = await _boardManager.GetGenerationAsync(boardId, generationNumber);
-            if (generation == null)
-                return NoContent();
-            return Ok(generation);
         }
     }
 }

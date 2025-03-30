@@ -359,8 +359,6 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-# Fody - auto-generated XML schema
-FodyWeavers.xsd
-/CarMakersApi/cars.db
-/CarMakersApi/cars.db-shm
-/CarMakersApi/cars.db-wal
+/Conway's Game of Life/game-of-life.db
+/Conway's Game of Life/game-of-life.db-shm
+/Conway's Game of Life/game-of-life.db-wal
