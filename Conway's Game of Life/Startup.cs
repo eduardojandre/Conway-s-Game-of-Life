@@ -28,6 +28,7 @@ namespace Conway_s_Game_of_Life
             services.AddScoped<IRepository<Board>, Repository<Board>>();
             services.AddScoped<IGenerationRepository,GenerationRepository>();
             services.AddScoped<IBoardManager, BoardManager.BoardManager>();
+            services.AddScoped<IBoardRulesEngine, BoardRulesEngine>();
             services.AddAutoMapper(typeof(MapperProfile));
 
             var jwtConfiguration = _configuration.GetSection("JwtConfiguration").Get<Utility.JwtConfiguration>();

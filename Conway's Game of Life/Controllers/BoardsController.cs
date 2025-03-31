@@ -44,7 +44,7 @@ namespace Conway_s_Game_of_Life.Controllers
 
         [RequiredScope(JwtConfiguration.ReadScope)]
         [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [HttpGet($"{{id}}")]
         public async Task<IActionResult> GetById([FromRoute] string id)
         {

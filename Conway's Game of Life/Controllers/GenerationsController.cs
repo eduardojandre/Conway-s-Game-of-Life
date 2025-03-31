@@ -15,7 +15,7 @@ namespace Conway_s_Game_of_Life.Controllers
     [ProducesResponseType(500)]
     [ProducesResponseType(403)]
     [ProducesResponseType(401)]
-    [ProducesResponseType(400)]
+    [ProducesResponseType(400)]    
     public class GenerationsController :ControllerBase
     {
         private readonly ILogger<BoardsController> _logger;
@@ -28,7 +28,7 @@ namespace Conway_s_Game_of_Life.Controllers
 
         [RequiredScope(JwtConfiguration.ReadScope)]
         [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [HttpGet($"current")]
         public async Task<IActionResult> GetCurrentGeneration([FromRoute] string boardId)
         {
@@ -46,11 +46,10 @@ namespace Conway_s_Game_of_Life.Controllers
         }
 
 
-        [RequiredScope(JwtConfiguration.ReadScope)]
-        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
+        [RequiredScope(JwtConfiguration.WriteScope)]
+        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 201)]
         [HttpPost($"final")]
-        public async Task<IActionResult> GetFinalGeneration([FromRoute] string boardId)
+        public async Task<IActionResult> CalculateFinalGeneration([FromRoute] string boardId)
         {
             try
             {
@@ -64,8 +63,7 @@ namespace Conway_s_Game_of_Life.Controllers
         }
 
         [RequiredScope(JwtConfiguration.WriteScope)]
-        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 200)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(typeof(BoardManager.DTOs.Board), 201)]
         [HttpPost()]
         public async Task<IActionResult> CreateGeneration([FromRoute] string boardId)
         {
@@ -82,7 +80,7 @@ namespace Conway_s_Game_of_Life.Controllers
 
         [RequiredScope(JwtConfiguration.ReadScope)]
         [ProducesResponseType(typeof(BoardManager.DTOs.Generation), 200)]
-        [ProducesResponseType(204)]
+        [ProducesResponseType(404)]
         [HttpGet($"{{generationNumber}}")]
         public async Task<IActionResult> GetGenerationByNumber([FromRoute] string boardId, int generationNumber)
         {
@@ -92,9 +90,8 @@ namespace Conway_s_Game_of_Life.Controllers
             return Ok(generation);
         }
 
-        [RequiredScope(JwtConfiguration.ReadScope)]
+        [RequiredScope(JwtConfiguration.WriteScope)]
         [ProducesResponseType(typeof(BoardManager.DTOs.Generation), 201)]
-        [ProducesResponseType(204)]
         [HttpPost($"{{generationNumber}}")]
         public async Task<IActionResult> CalculateGenerationNumber([FromRoute] string boardId, int generationNumber)
         {
